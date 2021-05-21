@@ -16,6 +16,8 @@ export default class SelectStage extends cc.Component {
     start() {
         this.playBGM();
         this.initInformation();
+        this.initRankButton();
+        this.initQuestionButton();
         this.initStage1Button();
         this.initStage2Button();
     }
@@ -38,6 +40,48 @@ export default class SelectStage extends cc.Component {
         });
     }
 
+    rankInformation(n) {
+        firebase.database().ref('rank/' + String(n)).once('value').then(snapshot => {
+            cc.find("Canvas/menu_bg/rank_text/user"+String(n)).getComponent(cc.Label).string = snapshot.val().user;
+            cc.find("Canvas/menu_bg/rank_text/score"+String(n)).getComponent(cc.Label).string = snapshot.val().score;
+        });
+    }
+
+    initRankButton() {
+        firebase.database().ref('rank/').orderByChild("score").once("value", function (snapshot) {
+            var user = []
+            var score = []
+
+            snapshot.forEach(function (item) {
+                user.push(item.key);
+                score.push(item.val().score);
+            })
+            user.reverse();
+            score.reverse(); 
+
+            for (var i = 1; i <= 10 && i <= user.length; i++) {
+                cc.find("Canvas/menu_bg/rank_text/"+String(i)).getComponent(cc.Label).string = String(i);
+                cc.find("Canvas/menu_bg/rank_text/user"+String(i)).getComponent(cc.Label).string = user[i-1];
+                cc.find("Canvas/menu_bg/rank_text/score"+String(i)).getComponent(cc.Label).string = score[i-1];
+            }
+        })
+        let clickEventHandler = new cc.Component.EventHandler();
+        clickEventHandler.target = this.node;
+        clickEventHandler.component = "SelectStage";
+        clickEventHandler.handler = "rank";
+
+        cc.find("Canvas/menu_bg/rank").getComponent(cc.Button).clickEvents.push(clickEventHandler);
+    }
+
+    initQuestionButton() {
+        let clickEventHandler = new cc.Component.EventHandler();
+        clickEventHandler.target = this.node;
+        clickEventHandler.component = "SelectStage";
+        clickEventHandler.handler = "question";
+
+        cc.find("Canvas/menu_bg/question").getComponent(cc.Button).clickEvents.push(clickEventHandler);
+    }
+
     initStage1Button() {
         let clickEventHandler = new cc.Component.EventHandler();
         clickEventHandler.target = this.node;
@@ -54,6 +98,14 @@ export default class SelectStage extends cc.Component {
         clickEventHandler.handler = "stage2";
 
         cc.find("Canvas/menu_bg/Stage2").getComponent(cc.Button).clickEvents.push(clickEventHandler);
+    }
+
+    rank() {
+        cc.find("Canvas/menu_bg/rank_text").active = !cc.find("Canvas/menu_bg/rank_text").active;
+    }
+
+    question() {
+        cc.find("Canvas/menu_bg/question_text").active = !cc.find("Canvas/menu_bg/question_text").active;
     }
 
     stage1() {

@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "platform",
+    "_name": "questionBox_m",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -24,10 +24,16 @@
       },
       {
         "__id__": 3
+      },
+      {
+        "__id__": 4
+      },
+      {
+        "__id__": 5
       }
     ],
     "_prefab": {
-      "__id__": 4
+      "__id__": 6
     },
     "_opacity": 255,
     "_color": {
@@ -39,8 +45,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 0,
-      "height": 0
+      "width": 16,
+      "height": 16
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -51,8 +57,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        92.263,
-        -181.901,
+        122.129,
+        86.98399,
         0,
         0,
         0,
@@ -96,7 +102,7 @@
     },
     "_angularVelocity": 0,
     "_fixedRotation": false,
-    "enabledContactListener": false,
+    "enabledContactListener": true,
     "bullet": false,
     "awakeOnLoad": true,
     "_id": ""
@@ -109,7 +115,7 @@
       "__id__": 1
     },
     "_enabled": true,
-    "tag": 3,
+    "tag": 2,
     "_density": 1,
     "_sensor": false,
     "_friction": 0.2,
@@ -117,14 +123,58 @@
     "body": null,
     "_offset": {
       "__type__": "cc.Vec2",
-      "x": 1.2,
-      "y": 0.4
+      "x": 1,
+      "y": 0.7
     },
     "_size": {
       "__type__": "cc.Size",
-      "width": 63.5,
-      "height": 2.6
+      "width": 14,
+      "height": 14.4
     },
+    "_id": ""
+  },
+  {
+    "__type__": "cc.Sprite",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "_materials": [
+      {
+        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
+      }
+    ],
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
+    "_spriteFrame": {
+      "__uuid__": "d4a8a0c6-e813-4919-b67d-e9da6a543ff0"
+    },
+    "_type": 0,
+    "_sizeMode": 1,
+    "_fillType": 0,
+    "_fillCenter": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "_fillStart": 0,
+    "_fillRange": 0,
+    "_isTrimmedMode": true,
+    "_atlas": {
+      "__uuid__": "047279c6-a12c-4364-87e7-c97388b380e1"
+    },
+    "_id": ""
+  },
+  {
+    "__type__": "70a79qBnS9E+5CVH48XzooD",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
     "_id": ""
   },
   {
@@ -135,7 +185,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "ba8C7jyGxKAZeeFqXn7TYS",
+    "fileId": "admuJmTqZK55EjmuYZOjUo",
     "sync": false
   }
 ]

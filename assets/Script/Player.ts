@@ -30,6 +30,8 @@ export default class Player extends cc.Component {
 
     private remainTime: number = 300;
 
+    private user: string;
+
     private email: string;
 
     private anim = null;
@@ -137,6 +139,7 @@ export default class Player extends cc.Component {
                 this.email = user.email.split(".").join("_").replace(/@/g, "_");
     
                 firebase.database().ref('users/' + this.email).once('value').then(snapshot => {
+                    this.user = snapshot.val().name;
                     this.life = Number(snapshot.val().life);
                     this.coin = Number(snapshot.val().coin);
                     this.score = Number(snapshot.val().score);
@@ -271,6 +274,13 @@ export default class Player extends cc.Component {
         cc.find("Canvas/addScore").getComponent(cc.Label).string = String(Math.floor(this.remainTime)*50);
         this.score += Math.floor(this.remainTime)*50;
         this.updateFirebase();
+        firebase.database().ref('rank/' + this.user).once('value').then(snapshot => {
+            if(this.score > snapshot.val().score) {
+                firebase.database().ref('rank/' + this.user).update({
+                    score: this.score
+                })
+            }
+        });
         this.scheduleOnce(function() {
             cc.director.loadScene("SelectStage");
         }, 8);
@@ -366,7 +376,7 @@ export default class Player extends cc.Component {
     jump() {
         this.onGround = false;
 
-        this.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 1100);
+        this.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 1200);
         this.playEffect(this.jumpSound);
     }
 
