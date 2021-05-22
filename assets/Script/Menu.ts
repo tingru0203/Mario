@@ -2,9 +2,21 @@ const {ccclass, property} = cc._decorator;
 
 @ccclass
 export default class Menu extends cc.Component {
+    @property({type:cc.AudioClip})
+    bgm: cc.AudioClip = null;
+
     start() {
+        this.playBGM();
         this.initLoginButton();
         this.initSignupButton();
+    }
+
+    playBGM(){
+        cc.audioEngine.playMusic(this.bgm, true);
+    }
+
+    stopBGM(){
+        cc.audioEngine.pauseMusic();
     }
 
     initLoginButton() {

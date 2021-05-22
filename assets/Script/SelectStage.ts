@@ -5,14 +5,6 @@ export default class SelectStage extends cc.Component {
     @property({type:cc.AudioClip})
     bgm: cc.AudioClip = null;
 
-    playBGM(){
-        cc.audioEngine.playMusic(this.bgm, true);
-    }
-
-    stopBGM(){
-        cc.audioEngine.pauseMusic();
-    }
-
     start() {
         this.playBGM();
         this.initInformation();
@@ -22,12 +14,21 @@ export default class SelectStage extends cc.Component {
         this.initStage2Button();
     }
 
+    playBGM(){
+        cc.audioEngine.playMusic(this.bgm, true);
+    }
+
+    stopBGM(){
+        cc.audioEngine.pauseMusic();
+    }
+
     initInformation() {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 var email = user.email.split(".").join("_").replace(/@/g, "_");
     
                 firebase.database().ref('users/' + email).once('value').then(snapshot => {
+                    cc.log(snapshot.val().name);
                     cc.find("Canvas/menu_bg/username").getComponent(cc.Label).string = snapshot.val().name;
                     cc.find("Canvas/menu_bg/lifeNum").getComponent(cc.Label).string = snapshot.val().life;
                     cc.find("Canvas/menu_bg/coinNum").getComponent(cc.Label).string = snapshot.val().coin;
@@ -40,19 +41,13 @@ export default class SelectStage extends cc.Component {
         });
     }
 
-    rankInformation(n) {
-        firebase.database().ref('rank/' + String(n)).once('value').then(snapshot => {
-            cc.find("Canvas/menu_bg/rank_text/user"+String(n)).getComponent(cc.Label).string = snapshot.val().user;
-            cc.find("Canvas/menu_bg/rank_text/score"+String(n)).getComponent(cc.Label).string = snapshot.val().score;
-        });
-    }
-
     initRankButton() {
         firebase.database().ref('rank/').orderByChild("score").once("value", function (snapshot) {
             var user = []
             var score = []
 
             snapshot.forEach(function (item) {
+                cc.log(item.key)
                 user.push(item.key);
                 score.push(item.val().score);
             })

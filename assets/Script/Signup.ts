@@ -16,7 +16,7 @@ export default class Signup extends cc.Component {
     }
 
     signup() {
-        var username = cc.find("Canvas/menu_bg/orange/Username").getComponent(cc.EditBox).string;
+        var username = cc.find("Canvas/menu_bg/orange/Username").getComponent(cc.EditBox).string.toUpperCase();
         var email = cc.find("Canvas/menu_bg/orange/Email").getComponent(cc.EditBox).string;
         var password = cc.find("Canvas/menu_bg/orange/Password").getComponent(cc.EditBox).string;
         firebase.auth().createUserWithEmailAndPassword(email, password).then(() => {

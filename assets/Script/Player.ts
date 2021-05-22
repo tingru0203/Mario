@@ -16,7 +16,7 @@ export default class Player extends cc.Component {
 
     public isPause: boolean = false; // stop
 
-    private isStrong: boolean = false; // for powerDown
+    isStrong: boolean = false; // for powerDown
 
     private isWin: boolean = false;
 
@@ -56,6 +56,9 @@ export default class Player extends cc.Component {
 
     @property({type:cc.AudioClip})
     stompSound: cc.AudioClip = null;
+
+    @property({type:cc.AudioClip})
+    kickSound: cc.AudioClip = null;
 
     @property({type:cc.AudioClip})
     coinSound: cc.AudioClip = null;
@@ -154,6 +157,14 @@ export default class Player extends cc.Component {
     updateFirebase() { // when lose life and win
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
+                firebase.database().ref('rank/' + this.user).once('value').then(snapshot => {
+                    if(this.score > snapshot.val().score) {
+                        firebase.database().ref('rank/' + this.user).update({
+                            score: this.score
+                        })
+                    }
+                });
+
                 if(this.life <= 0) {
                     firebase.database().ref('users/' + this.email).update({
                         life: 5,
@@ -236,7 +247,7 @@ export default class Player extends cc.Component {
                 this.anim.play("big_die");
             else
                 this.anim.play("die");
-            this.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 1000);
+            this.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 1500);
 
             this.scheduleOnce(function() {
                 this.playEffect(this.gameoverSound);
@@ -251,7 +262,7 @@ export default class Player extends cc.Component {
                 this.anim.play("big_die");
             else
                 this.anim.play("die");
-            this.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 1000);
+            this.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 1000);   
 
             this.scheduleOnce(function() {
                 if(cc.find("Canvas/Main Camera/worldNum").getComponent(cc.Label).string == "1")
@@ -274,16 +285,9 @@ export default class Player extends cc.Component {
         cc.find("Canvas/addScore").getComponent(cc.Label).string = String(Math.floor(this.remainTime)*50);
         this.score += Math.floor(this.remainTime)*50;
         this.updateFirebase();
-        firebase.database().ref('rank/' + this.user).once('value').then(snapshot => {
-            if(this.score > snapshot.val().score) {
-                firebase.database().ref('rank/' + this.user).update({
-                    score: this.score
-                })
-            }
-        });
         this.scheduleOnce(function() {
             cc.director.loadScene("SelectStage");
-        }, 8);
+        }, 7);
     }
 
     cameraMove(dt) {
@@ -367,12 +371,6 @@ export default class Player extends cc.Component {
         this.cameraMove(dt);
     }   
 
-    littleJump() {
-        this.onGround = false;
-
-        this.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 500);
-    }
-
     jump() {
         this.onGround = false;
 
@@ -408,7 +406,26 @@ export default class Player extends cc.Component {
         coin.runAction(action1);
     }
 
+    enemyDie_100(other) {
+        this.playEffect(this.kickSound);
+
+        let score = cc.instantiate(this.score100Prefab);
+        score.parent = cc.find("Canvas");
+        score.setPosition(other.node.x, other.node.y+50);
+
+        let add100 = cc.callFunc(function(target) {
+            this.score += 100;
+        }, this);
+
+        let action = cc.sequence(cc.spawn(cc.moveBy(0.5, 0, 50), cc.fadeOut(0.5)), add100);
+
+        score.runAction(action);
+    }
+
     stompEnemy_100(other) {
+        this.playEffect(this.stompSound);
+        this.jump();
+
         let score = cc.instantiate(this.score100Prefab);
         score.parent = cc.find("Canvas");
         score.setPosition(other.node.x, other.node.y+50);
@@ -421,12 +438,13 @@ export default class Player extends cc.Component {
             other.node.destroy(); 
         }, this);
 
-        let action = cc.sequence(cc.spawn(cc.moveBy(1, 0, 50), cc.fadeOut(1)), add100, destroy); //enemy
+        let action0 = cc.sequence(cc.spawn(cc.moveBy(0.5, 0, 50), cc.fadeOut(0.5)), add100, destroy); // goomba
+        let action1 = cc.sequence(cc.spawn(cc.moveBy(0.5, 0, 50), cc.fadeOut(0.5)), add100); // turtle
 
-        other.node.getComponent(cc.RigidBody).linearVelocity = cc.v2(0, 0);
-        other.node.active = false;
-
-        score.runAction(action);
+        if(other.tag == 4) // goomba
+            score.runAction(action0);
+        else // turtle
+            score.runAction(action1);
     }
 
     eatMushroom_1000(other) {
@@ -526,14 +544,16 @@ export default class Player extends cc.Component {
     }
 
     onBeginContact(contact, self, other) {
-        if(this.isDead)
+        if(this.isDead) {
+            contact.disabled = true;
             return;
+        }
+            
         if(other.tag == 0) { //gound
             cc.log("Player hits the ground");
             this.onGround = true;
         }
         else if(other.tag == 1) { //block 
-            cc.log(contact.getWorldManifold().normal);
             cc.log("Player hits the block");
             if(contact.getWorldManifold().normal.x == 0 && contact.getWorldManifold().normal.y == -1) { //upside
                 this.onGround = true;
@@ -572,25 +592,9 @@ export default class Player extends cc.Component {
 
         else if(other.tag == 4) { //goomba
             cc.log("Player hits the goomba");
-            if(contact.getWorldManifold().normal.x == 0 && contact.getWorldManifold().normal.y == -1) { //upside
-                this.playEffect(this.stompSound);
-                this.stompEnemy_100(other);
-                this.littleJump();
-            }
-            else {
-                this.decrease();
-            }
         }
         else if(other.tag == 5) { //turtle
             cc.log("Player hits the turtle");
-            if(contact.getWorldManifold().normal.x == 0 && contact.getWorldManifold().normal.y == -1) { //upside
-                this.playEffect(this.stompSound);
-                this.stompEnemy_100(other);
-                this.littleJump();
-            }
-            else {
-                this.decrease();
-            }
         }
         else if(other.tag == 6) { //flower
             cc.log("Player hits the flower");
