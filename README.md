@@ -35,11 +35,11 @@
 
 3. Enemies : 3種Enemies
 
-* Goomba
+* Goomba : 被踩到會死亡
 
 <img src="picture_md/goomba.png" width="50"/>
 
-* Turtle
+* Turtle : 被踩到會變成龜殼，龜殼被踢到會開始快速移動
 
 <img src="picture_md/turtle.png" width="50"/>
 
