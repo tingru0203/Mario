@@ -1,5 +1,7 @@
 # Software Studio 2021 Spring Assignment 2
 
+link: https://as2-mario-76745.web.app/
+
 ## Basic Components
 |Component|Score|Y/N|
 |:-:|:-:|:-:|
